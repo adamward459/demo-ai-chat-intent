@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../styles.css" />
+    <script>
+      let sendMessageToGo1;
+
+      function navigate(path) {
+        document.getElementById('go1-search-iframe-in-here').setAttribute('src', `https://embedding.go1.com/${path}`);
+      }
+
+      function sendMessage() {
+        const message = {
+          type: 'increment_offset',
+          payload: undefined,
+        };
+        sendMessageToGo1(message);
+      }
+
+      function embedGo1() {
+        let ott;
+        const options = {
+          feature: 'ai-chat',
+          portalURL: 'go1learning.mygo1.com',
+          iframeParentId: 'iframe-in-here',
+          onGo1MessageReceived: (message) => {
+            console.log(`received a message`);
+            console.log(message);
+            // Third party client can react to the message received from GO1
+            if (message.type === 'ott_required') {
+              console.log('Received ott_required message from GO1');
+              // generate ott from go1 api call and pass it to the child
+              const generatedOTT = undefined;
+              if (generatedOTT) {
+                sendMessageToGo1({
+                  type: 'pass_ott',
+                  payload: generatedOTT,
+                });
+              }
+            }
+          },
+          themeInformation: {
+            accent: '#0437F2',
+          },
+          featureAttributes: {
+            shouldSuppressPreview: false,
+            experience: 'learner',
+            intent: 'skill_gap',
+            existingSkills: ['Design Thinking', 'Problem Solving', 'Product Strategy'],
+            desiredSkills: ['Straegic Planning', 'Competitive Analysis', 'Data & Insights', 'Evangelism'],
+          },
+          additionalUserInfo: {
+            jobTitle: 'Associate Product Manager',
+          },
+          oneTimeToken: ott,
+        };
+        sendMessageToGo1 = go1Init(options);
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- Side navigation -->
+    <div class="sidenav">
+      <a href="#" onclick="navigate('search')">Search</a>
+      <a href="#" onclick="navigate('content-hub')">Content Hub</a>
+      <a href="#" onclick="navigate('preview/1895648')">Preview</a>
+    </div>
+
+    <!-- Page content -->
+    <div class="main">
+      <h1>Welcome to External LMS</h1>
+      <h2>Please curate your library</h2>
+      <button style="display: none" id="button-send-metrics" onClick="sendMessage()">send message to metrics</button>
+      <div class="iframe-in-here" id="iframe-in-here"></div>
+    </div>
+
+    <script type="text/javascript" onload="embedGo1()" src="https://embedding.go1.com/js/embedding.js"></script>
+  </body>
+</html>
